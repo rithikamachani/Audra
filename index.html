@@ -1432,6 +1432,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSlider('high', 35);
   updateSlider('treble', 20);
   setMood('calm');
+  loadProfile(); // restore saved hearing profile
 });
 
 // ===================== AUDIO CONTEXT =====================
@@ -1808,12 +1809,38 @@ function setMood(mood) {
   }
 }
 
-// ===================== SLIDERS =====================
+// ===================== SLIDERS + LOCALSTORAGE =====================
 function updateSlider(name, val) {
   const pct = val + '%';
   document.getElementById('fill-' + name).style.width = pct;
   document.getElementById('thumb-' + name).style.left = pct;
   document.getElementById('val-' + name).textContent = val + '%';
+  saveProfile();
+}
+
+function saveProfile() {
+  const profile = {
+    bass:   document.getElementById('slider-bass').value,
+    mid:    document.getElementById('slider-mid').value,
+    high:   document.getElementById('slider-high').value,
+    treble: document.getElementById('slider-treble').value,
+  };
+  try { localStorage.setItem('audra-profile', JSON.stringify(profile)); } catch(e) {}
+}
+
+function loadProfile() {
+  try {
+    const saved = localStorage.getItem('audra-profile');
+    if (!saved) return;
+    const p = JSON.parse(saved);
+    ['bass','mid','high','treble'].forEach(name => {
+      if (p[name] !== undefined) {
+        document.getElementById('slider-' + name).value = p[name];
+        updateSlider(name, p[name]);
+      }
+    });
+    showToast('Profile restored ✓');
+  } catch(e) {}
 }
 
 // ===================== TOGGLES =====================
