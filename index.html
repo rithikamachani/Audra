@@ -561,6 +561,127 @@ input[type=range] {
 }
 .freq-readout { font-size: 9px; font-family: var(--mono); color: var(--text3); white-space: nowrap; }
 
+/* ===================== ABOUT PAGE ===================== */
+.about-hero {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.about-rings {
+  width: 100px; height: 100px;
+  position: relative; flex-shrink: 0;
+}
+
+.about-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--blue);
+  opacity: 0.4;
+  animation: artRing var(--d, 2s) ease-in-out infinite;
+}
+
+.about-wordmark {
+  font-size: 28px; font-weight: 600;
+  letter-spacing: -0.04em; color: var(--text);
+  margin-bottom: 4px;
+}
+.about-wordmark em { color: var(--blue); font-style: normal; }
+.about-tagline { font-size: 13px; color: var(--text2); font-style: italic; }
+
+.about-story-card { padding: 0; overflow: hidden; }
+
+.story-block {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 18px;
+}
+
+.story-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+.story-text { flex: 1; }
+.story-title {
+  font-size: 13px; font-weight: 500;
+  color: var(--text); margin-bottom: 6px;
+  line-height: 1.3;
+}
+.story-body {
+  font-size: 12px; color: var(--text2);
+  line-height: 1.75;
+}
+
+.story-divider {
+  height: 0.5px; background: var(--border);
+  margin: 0 18px;
+}
+
+.feature-list { display: flex; flex-direction: column; gap: 0; }
+
+.feat-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.feat-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 5px;
+}
+
+.feat-item-body { flex: 1; }
+.feat-item-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.feat-item-desc { font-size: 11px; color: var(--text2); line-height: 1.6; }
+
+.tech-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 14px;
+}
+
+.tech-chip {
+  font-size: 10px; font-weight: 500;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  color: var(--text2);
+  font-family: var(--mono);
+}
+
+.built-note {
+  font-size: 11px; color: var(--text3);
+  line-height: 1.6;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--border);
+}
+
+.about-mission {
+  padding: 20px 18px;
+  background: linear-gradient(135deg, rgba(59,139,221,0.06), rgba(127,119,221,0.06));
+  border-color: rgba(59,139,221,0.2);
+}
+
+.mission-quote {
+  font-size: 13px; color: var(--text);
+  line-height: 1.75; font-style: italic;
+  margin-bottom: 10px;
+}
+
+.mission-sub {
+  font-size: 11px; font-weight: 500;
+  color: var(--blue);
+}
+
+.about-footer {
+  display: flex; align-items: center;
+  justify-content: center; gap: 8px;
+  padding: 8px 0 4px;
+}
+
+.footer-item { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.footer-dot { color: var(--text3); font-size: 10px; }
+
 /* ===================== TOAST ===================== */
 .toast {
   position: fixed;
@@ -586,9 +707,226 @@ input[type=range] {
 .panel.active > *:nth-child(2) { animation-delay: 0.05s; }
 .panel.active > *:nth-child(3) { animation-delay: 0.1s; }
 .panel.active > *:nth-child(4) { animation-delay: 0.15s; }
+
+/* ===================== SPLASH SCREEN ===================== */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #0D0C0A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#splash.exit {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.splash-rings {
+  position: relative;
+  width: 120px; height: 120px;
+  margin-bottom: 36px;
+}
+
+.splash-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid #3B8BDD;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  animation: splashRingIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+             splashRingPulse 3s ease-in-out infinite;
+}
+
+@keyframes splashRingIn {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes splashRingPulse {
+  0%,100% { opacity: 0.25; }
+  50%     { opacity: 0.7; }
+}
+
+.splash-center-dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #3B8BDD;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%,100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50%     { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
+}
+
+.splash-wordmark {
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  color: #EDE9E3;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: splashWordIn 0.7s 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.splash-wordmark em {
+  color: #3B8BDD;
+  font-style: normal;
+}
+
+@keyframes splashWordIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.splash-tagline {
+  font-size: 14px;
+  color: #8A8680;
+  font-style: italic;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: splashWordIn 0.7s 0.6s ease both;
+}
+
+.splash-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: splashWordIn 0.6s 0.85s ease both;
+}
+
+.splash-feat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.splash-feat-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.splash-feat-text {
+  font-size: 12px;
+  color: #6B6860;
+  line-height: 1.4;
+}
+
+.splash-feat-text strong {
+  color: #ABA89F;
+  font-weight: 500;
+}
+
+.splash-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  border-radius: 28px;
+  background: #3B8BDD;
+  border: none;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0;
+  animation: splashWordIn 0.6s 1.1s ease both;
+  transition: opacity 0.2s, transform 0.2s;
+  letter-spacing: -0.01em;
+}
+
+.splash-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.03);
+}
+
+.splash-btn svg {
+  transition: transform 0.2s;
+}
+
+.splash-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.splash-wcag {
+  position: absolute;
+  bottom: 24px;
+  font-size: 10px;
+  color: #3A3835;
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  animation: splashWordIn 0.5s 1.3s ease both;
+}
 </style>
 </head>
 <body>
+
+<!-- ===================== SPLASH SCREEN ===================== -->
+<div id="splash">
+
+  <!-- Animated rings -->
+  <div class="splash-rings">
+    <div class="splash-ring" style="width:24px;height:24px;animation-delay:0.05s,0.9s;animation-duration:0.8s,2.2s;"></div>
+    <div class="splash-ring" style="width:48px;height:48px;animation-delay:0.1s,1.1s;animation-duration:0.8s,2.5s;"></div>
+    <div class="splash-ring" style="width:74px;height:74px;animation-delay:0.15s,1.3s;animation-duration:0.8s,2.8s;"></div>
+    <div class="splash-ring" style="width:100px;height:100px;animation-delay:0.2s,1.5s;animation-duration:0.8s,3.1s;"></div>
+    <div class="splash-ring" style="width:120px;height:120px;animation-delay:0.25s,1.7s;animation-duration:0.8s,3.4s;opacity:0.12;"></div>
+    <div class="splash-center-dot"></div>
+  </div>
+
+  <!-- Name -->
+  <div class="splash-wordmark">au<em>d</em>ra</div>
+  <div class="splash-tagline">Music you can feel</div>
+
+  <!-- Features -->
+  <div class="splash-features">
+    <div class="splash-feat">
+      <div class="splash-feat-dot" style="background:#3B8BDD;"></div>
+      <div class="splash-feat-text"><strong>See</strong> the frequency landscape of any song</div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-dot" style="background:#1D9E75;"></div>
+      <div class="splash-feat-text"><strong>Feel</strong> the rhythm through a visual beat grid</div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-dot" style="background:#D4537E;"></div>
+      <div class="splash-feat-text"><strong>Read</strong> lyrics that move with the music's emotion</div>
+    </div>
+    <div class="splash-feat">
+      <div class="splash-feat-dot" style="background:#7F77DD;"></div>
+      <div class="splash-feat-text"><strong>Tune</strong> it to your own hearing profile</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <button class="splash-btn" onclick="dismissSplash()">
+    Start listening
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- WCAG badge -->
+  <div class="splash-wcag">WCAG 2.1 AA · Built for hearing-impaired listeners</div>
+
+</div>
 
 <div class="app-shell">
 
@@ -609,6 +947,7 @@ input[type=range] {
     <button class="tab active" onclick="switchTab('now', this)">Now Playing</button>
     <button class="tab" onclick="switchTab('emotion', this)">Emotion</button>
     <button class="tab" onclick="switchTab('profile', this)">Profile</button>
+    <button class="tab" onclick="switchTab('about', this)">About</button>
   </div>
 
   <!-- PANELS -->
@@ -873,6 +1212,154 @@ input[type=range] {
 
     </div>
 
+    <!-- ABOUT PANEL -->
+    <div class="panel" id="panel-about">
+
+      <!-- Hero -->
+      <div class="about-hero card">
+        <div class="about-rings">
+          <div class="about-ring" style="width:48px;height:48px;top:26px;left:26px;--d:2s;"></div>
+          <div class="about-ring" style="width:72px;height:72px;top:14px;left:14px;--d:2.8s;"></div>
+          <div class="about-ring" style="width:96px;height:96px;top:2px;left:2px;--d:3.5s;"></div>
+        </div>
+        <div class="about-hero-text">
+          <div class="about-wordmark">au<em>d</em>ra</div>
+          <div class="about-tagline">Music you can feel</div>
+        </div>
+      </div>
+
+      <!-- Origin story -->
+      <div>
+        <div class="section-label">The story</div>
+        <div class="card about-story-card">
+          <div class="story-block">
+            <div class="story-icon">👴</div>
+            <div class="story-text">
+              <div class="story-title">It started with someone who loves music</div>
+              <div class="story-body">Music had always been a constant — until a hearing aid changed everything. The frequencies that carry the warmth of a melody, the shimmer of a cymbal, the brightness of a voice — all quietly filtered out. The music was still playing. But something essential was missing.</div>
+            </div>
+          </div>
+
+          <div class="story-divider"></div>
+
+          <div class="story-block">
+            <div class="story-icon">🔍</div>
+            <div class="story-text">
+              <div class="story-title">The gap nobody had fixed</div>
+              <div class="story-body">Most music apps are built for people who can hear everything. Hearing aids filter out specific frequency ranges — and nobody had designed around that gap. Not streaming platforms. Not accessibility tools. Not even AI-powered solutions that claimed to help.</div>
+            </div>
+          </div>
+
+          <div class="story-divider"></div>
+
+          <div class="story-block">
+            <div class="story-icon">🎹</div>
+            <div class="story-text">
+              <div class="story-title">Music as a foundation for accessible design</div>
+              <div class="story-body">Music taught us something: communication doesn't require a single channel. A melody can be felt, not just heard. Rhythm can be seen, not just counted. Emotion can be read in a color, not just a chord. Audra was built on that idea — that every dimension of music can be translated into something accessible to every kind of listener.</div>
+            </div>
+          </div>
+
+          <div class="story-divider"></div>
+
+          <div class="story-block">
+            <div class="story-icon">🛠</div>
+            <div class="story-text">
+              <div class="story-title">Built through iteration, shaped by real feedback</div>
+              <div class="story-body">Audra wasn't designed once and shipped. It went through multiple JavaScript iterations, each one tested by a real hearing-impaired listener. What confused them became the next fix. What moved them became the next feature. That loop — build, test, listen, rebuild — is still how Audra grows.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- What Audra does -->
+      <div>
+        <div class="section-label">What Audra does</div>
+        <div class="card" style="padding: 16px;">
+          <div class="feature-list">
+
+            <div class="feat-item">
+              <div class="feat-dot" style="background:var(--blue);"></div>
+              <div class="feat-item-body">
+                <div class="feat-item-title">Frequency landscape</div>
+                <div class="feat-item-desc">Real-time waveform that breathes with the music — making the invisible texture of sound visible as a living background.</div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-dot" style="background:var(--green);"></div>
+              <div class="feat-item-body">
+                <div class="feat-item-title">Emotion map</div>
+                <div class="feat-item-desc">Every song has a mood. Audra translates it into color and shape — so you know how a song feels before a single note reaches you.</div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-dot" style="background:var(--coral);"></div>
+              <div class="feat-item-body">
+                <div class="feat-item-title">Animated lyrics</div>
+                <div class="feat-item-desc">Words don't just appear — they move with the weight, pitch, and emotion of how they're sung. A whisper fades in softly. A belted note bursts large.</div>
+              </div>
+            </div>
+
+            <div class="feat-item">
+              <div class="feat-dot" style="background:var(--amber);"></div>
+              <div class="feat-item-body">
+                <div class="feat-item-title">Rhythm grid</div>
+                <div class="feat-item-desc">The skeleton of a song — bass, mid, high, treble — mapped to a visual pulse grid. See the structure of the beat, not just hear it.</div>
+              </div>
+            </div>
+
+            <div class="feat-item" style="border-bottom:none;padding-bottom:0;margin-bottom:0;">
+              <div class="feat-dot" style="background:var(--purple);"></div>
+              <div class="feat-item-body">
+                <div class="feat-item-title">Hearing profile</div>
+                <div class="feat-item-desc">Tune the frequency boost to match your hearing aid's profile. Audra amplifies visually what your device filters out — a different channel for the same music.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Built with -->
+      <div>
+        <div class="section-label">Built with</div>
+        <div class="card" style="padding:16px;">
+          <div class="tech-grid">
+            <div class="tech-chip">Web Audio API</div>
+            <div class="tech-chip">WCAG 2.1 AA</div>
+            <div class="tech-chip">Real-time FFT</div>
+            <div class="tech-chip">Beat detection</div>
+            <div class="tech-chip">Canvas API</div>
+            <div class="tech-chip">JavaScript</div>
+            <div class="tech-chip">CSS animations</div>
+            <div class="tech-chip">localStorage</div>
+          </div>
+          <div class="built-note">Audra runs entirely in your browser — no app install, no account, no data collected. Your hearing profile stays on your device.</div>
+        </div>
+      </div>
+
+      <!-- Mission -->
+      <div>
+        <div class="section-label">Mission</div>
+        <div class="card about-mission">
+          <div class="mission-quote">"Music communicates across every boundary — language, culture, age. Audra exists to make sure hearing is never another boundary it can't cross."</div>
+          <div class="mission-sub">Designed for hearing-impaired listeners. Built for everyone.</div>
+        </div>
+      </div>
+
+      <!-- Version -->
+      <div class="about-footer">
+        <span class="footer-item">Audra v1.0</span>
+        <span class="footer-dot">·</span>
+        <span class="footer-item">Phase 1</span>
+        <span class="footer-dot">·</span>
+        <span class="footer-item">Open source</span>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- STATUS BAR -->
@@ -927,6 +1414,13 @@ const MOODS = {
   energetic: { colors: ['#D4880A','#D4537E'], label: 'Energetic · Driving · Intense', desc: 'Heavy bass presence, fast tempo, and a prominent rhythm section. The kind of song that fills a space completely.' },
   nostalgic: { colors: ['#7F77DD','#3B8BDD'], label: 'Nostalgic · Warm · Distant', desc: 'Slower tempo with rich harmonic texture. The frequencies your grandfather\'s hearing aid works hardest to preserve.' },
 };
+
+// ===================== SPLASH =====================
+function dismissSplash() {
+  const splash = document.getElementById('splash');
+  splash.classList.add('exit');
+  setTimeout(() => { splash.style.display = 'none'; }, 650);
+}
 
 // ===================== INIT =====================
 document.addEventListener('DOMContentLoaded', () => {
