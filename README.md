@@ -20,11 +20,17 @@ Audra is built to the WCAG 2.1 AA standard throughout:
 Tech stack
 
 HTML / CSS / JavaScript       — core structure and styling
+
 Web Audio API                 — real-time audio capture and frequency analysis
+
 Canvas API                    — waveform and emotion map rendering
+
 FFT (Fast Fourier Transform)  — frequency band decomposition
+
 Beat detection                — rhythm grid synchronization
+
 localStorage                  — hearing profile persistence
+
 DM Sans + DM Mono             — accessible, legible typography
 
 
