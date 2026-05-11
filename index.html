@@ -708,6 +708,18 @@ input[type=range] {
 .panel.active > *:nth-child(3) { animation-delay: 0.1s; }
 .panel.active > *:nth-child(4) { animation-delay: 0.15s; }
 
+/* ===================== FLASH OVERLAY ===================== */
+#flashOverlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.05s ease;
+  mix-blend-mode: screen;
+}
+#flashOverlay.flash { opacity: 1; }
+
 /* ===================== SPLASH SCREEN ===================== */
 #splash {
   position: fixed;
@@ -1181,6 +1193,15 @@ input[type=range] {
           <div class="toggle-section">
             <div class="toggle-row">
               <div class="toggle-info">
+                <div class="toggle-name">Screen Flash on Beats</div>
+                <div class="toggle-desc">Subtle full-screen pulse on loud moments</div>
+              </div>
+              <div class="toggle-switch on" id="toggle-flash" onclick="toggleFlash(this)">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
                 <div class="toggle-name">High Contrast Mode</div>
                 <div class="toggle-desc">Stronger color distinction</div>
               </div>
@@ -1377,6 +1398,9 @@ input[type=range] {
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- FLASH OVERLAY -->
+<div id="flashOverlay"></div>
+
 <script>
 // ===================== STATE =====================
 let audioCtx = null, analyser = null, source = null;
@@ -1391,6 +1415,7 @@ let layers = { viz: true, lyrics: true, grid: true, emotion: true };
 let currentMood = 'calm';
 let fpsCount = 0, fpsLast = 0;
 let isDark = true;
+let lastFlash = 0, flashCooldown = 600; // ms between flashes
 
 const LYRICS = [
   { text: "I see trees of green", speed: "normal" },
@@ -1639,6 +1664,9 @@ function draw(ts = 0) {
 
   const intensity = (bass + mid + high + treb) / 4;
 
+  // Screen flash on beat drops
+  triggerFlash(bass, mid, high, treb, intensity, ts);
+
   // Intensity meter
   document.getElementById('intensityFill').style.width = Math.round(intensity * 100) + '%';
   const peakFreq = freqData.indexOf(Math.max(...freqData));
@@ -1648,6 +1676,47 @@ function draw(ts = 0) {
   if (layers.viz) drawWave(timeData, freqData, intensity);
   if (layers.grid) drawGrid(bass, mid, high, treb, ts);
   if (layers.emotion) drawEmotion(bass, mid, high, treb);
+}
+
+// ===================== SCREEN FLASH =====================
+function triggerFlash(bass, mid, high, treb, intensity, ts) {
+  if (ts - lastFlash < flashCooldown) return;
+
+  const overlay = document.getElementById('flashOverlay');
+  let color = null;
+  let threshold = 0.55;
+
+  // Bass drop — deep blue pulse
+  if (bass > threshold + 0.1) {
+    color = 'rgba(59,139,221,0.18)';
+    flashCooldown = 500;
+  }
+  // Mid surge — green pulse
+  else if (mid > threshold + 0.15) {
+    color = 'rgba(29,158,117,0.14)';
+    flashCooldown = 550;
+  }
+  // High burst — amber pulse
+  else if (high > threshold + 0.2) {
+    color = 'rgba(212,136,10,0.12)';
+    flashCooldown = 600;
+  }
+  // Overall intensity peak — white pulse
+  else if (intensity > threshold + 0.25) {
+    color = 'rgba(255,255,255,0.08)';
+    flashCooldown = 700;
+  }
+
+  if (!color) return;
+
+  lastFlash = ts;
+  overlay.style.background = color;
+  overlay.classList.add('flash');
+
+  setTimeout(() => {
+    overlay.classList.remove('flash');
+    setTimeout(() => { overlay.style.background = ''; }, 60);
+  }, 80);
 }
 
 // ===================== WAVEFORM =====================
@@ -1848,6 +1917,13 @@ function toggleLayer(name, el) {
   el.classList.toggle('on');
   layers[name] = el.classList.contains('on');
   showToast((layers[name] ? 'Showing' : 'Hiding') + ' ' + name);
+}
+
+function toggleFlash(el) {
+  el.classList.toggle('on');
+  const on = el.classList.contains('on');
+  flashCooldown = on ? 600 : Infinity;
+  showToast('Screen flash ' + (on ? 'on' : 'off'));
 }
 
 function toggleLargeText(el) {
