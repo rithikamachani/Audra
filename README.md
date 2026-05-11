@@ -1,18 +1,12 @@
 # 🎵 Audra — *Music You Can Feel*
 
-![WCAG](https://img.shields.io/badge/WCAG-2.1_AA-1D9E75?style=flat-square) ![Phase](https://img.shields.io/badge/Phase-1_Complete-185FA5?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-534AB7?style=flat-square) ![HTML](https://img.shields.io/badge/Built_with-HTML_CSS_JS-D4537E?style=flat-square)
-
-> *"Music communicates across every boundary — language, culture, age. Audra exists to make sure hearing is never another boundary it can't cross."*
-
-🔗 **[Live Demo → rithikamachani.github.io/Audra](https://rithikamachani.github.io/Audra)**
+![WCAG](https://img.shields.io/badge/WCAG-2.1_AA-1D9E75?style=flat-square) ![HTML](https://img.shields.io/badge/Built_with-HTML_CSS_JS-D4537E?style=flat-square)
 
 ---
 
 ## Why Audra exists
 
-Most music apps are built for **people who can hear everything.**
-
-Hearing aids filter out specific frequency ranges — the shimmer of a cymbal, the brightness of a voice, the warmth of a high melody. Those frequencies don't reach the listener. The music is still playing, but ***something essential is missing.***
+Most music apps are built for **people who can hear everything.** Hearing aids filter out specific frequency ranges — the shimmer of a cymbal, the brightness of a voice, the warmth of a high melody. Those frequencies don't reach the listener. The music is still playing, but ***something essential is missing.***
 
 Audra was built to fill that gap. Not by fixing the audio — but by creating a **parallel visual channel** that carries everything the sound carries:
 
