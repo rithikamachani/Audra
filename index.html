@@ -561,6 +561,134 @@ input[type=range] {
 }
 .freq-readout { font-size: 9px; font-family: var(--mono); color: var(--text3); white-space: nowrap; }
 
+/* ===================== MULTI-PROFILE ===================== */
+.profile-row-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.profile-row-item:last-of-type { border-bottom: none; }
+.profile-row-item:hover { background: var(--bg3); }
+.profile-row-item.active-profile { background: rgba(59,139,221,0.08); }
+
+.p-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; color: white;
+  flex-shrink: 0;
+}
+
+.p-info { flex: 1; }
+.p-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.p-sub { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+.p-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.p-check.checked {
+  background: var(--blue); border-color: var(--blue);
+}
+.p-check.checked::after { content: '✓'; font-size: 9px; color: white; font-weight: 700; }
+
+.p-delete {
+  width: 24px; height: 24px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text3); font-size: 14px; flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.p-delete:hover { background: rgba(212,83,126,0.1); color: var(--coral); }
+
+.add-profile-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 12px 16px;
+  background: transparent; border: none;
+  border-top: 0.5px solid var(--border);
+  color: var(--text2); font-size: 12px; font-weight: 500;
+  cursor: pointer; font-family: var(--font);
+  transition: background 0.15s;
+}
+.add-profile-btn:hover { background: var(--bg3); }
+
+/* MODAL */
+.profile-modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: flex-end;
+  padding: 0;
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  width: 100%; max-width: 420px; margin: 0 auto;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 36px;
+  border: 0.5px solid var(--border);
+  animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.modal-title { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 14px; letter-spacing: -0.02em; }
+
+.modal-input {
+  width: 100%; padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.modal-input:focus { border-color: var(--blue); }
+
+.modal-presets-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 20px; }
+
+.preset-chip {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border);
+  background: var(--bg3);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.preset-chip:hover { border-color: var(--blue); background: rgba(59,139,221,0.06); }
+.preset-chip.selected-preset { border-color: var(--blue); background: rgba(59,139,221,0.1); }
+
+.preset-chip-name { font-size: 11px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.preset-chip-desc { font-size: 9px; color: var(--text2); line-height: 1.4; }
+
+.preset-bars { display: flex; gap: 2px; align-items: flex-end; margin-bottom: 5px; }
+.pb { width: 6px; border-radius: 1px 1px 0 0; }
+
+.modal-btns { display: flex; gap: 8px; }
+.modal-btn {
+  flex: 1; padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border);
+  background: transparent; color: var(--text);
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s;
+}
+.modal-btn:hover { background: var(--bg3); }
+.modal-btn.primary { background: var(--blue); border-color: var(--blue); color: white; }
+.modal-btn.primary:hover { opacity: 0.88; }
+
 /* ===================== ABOUT PAGE ===================== */
 .about-hero {
   padding: 24px 20px;
@@ -1086,17 +1214,41 @@ input[type=range] {
 
     <!-- PROFILE PANEL -->
     <div class="panel" id="panel-profile">
-      <div>
-        <div class="section-label">Listener Profile</div>
-        <div class="card">
-          <div class="profile-header">
-            <div class="profile-avatar">G</div>
-            <div>
-              <div class="profile-name">Grandpa's Profile</div>
-              <div class="profile-sub">Hearing aid · Right ear dominant</div>
-            </div>
-          </div>
 
+      <!-- Profile Switcher -->
+      <div>
+        <div class="section-label">Profiles</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div id="profileList"></div>
+          <button class="add-profile-btn" onclick="addProfile()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 2v10M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Add new profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Profile Modal -->
+      <div id="profileModal" class="profile-modal" style="display:none;">
+        <div class="modal-card">
+          <div class="modal-title">New profile</div>
+          <input type="text" id="profileNameInput" class="modal-input" placeholder="e.g. Grandpa, Mom, Default..." maxlength="20"/>
+          <div class="modal-presets-label">Start from a preset</div>
+          <div class="preset-grid" id="presetGrid"></div>
+          <div class="modal-btns">
+            <button class="modal-btn" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn primary" onclick="saveNewProfile()">Create profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Profile Settings -->
+      <div>
+        <div class="section-label">
+          <span id="activeProfileLabel">Profile settings</span>
+        </div>
+        <div class="card">
           <div class="slider-section">
             <div class="section-label" style="margin-bottom:14px;">Frequency Boost</div>
 
@@ -1452,12 +1604,8 @@ document.addEventListener('DOMContentLoaded', () => {
   buildGrid();
   buildLyrics(LYRICS[0]);
   startEmotionCanvas();
-  updateSlider('bass', 70);
-  updateSlider('mid', 55);
-  updateSlider('high', 35);
-  updateSlider('treble', 20);
   setMood('calm');
-  loadProfile(); // restore saved hearing profile
+  initProfiles(); // load or create profiles, apply active one
 });
 
 // ===================== AUDIO CONTEXT =====================
@@ -1878,39 +2026,193 @@ function setMood(mood) {
   }
 }
 
-// ===================== SLIDERS + LOCALSTORAGE =====================
+// ===================== MULTI-PROFILE SYSTEM =====================
+const PRESETS = [
+  { id: 'balanced',  name: 'Balanced',       desc: 'No hearing loss',           bass: 50, mid: 50, high: 50, treble: 50, bars: [20,20,20,20], color: '#185FA5' },
+  { id: 'age',       name: 'Age-related',    desc: 'High frequencies lost',     bass: 80, mid: 55, high: 25, treble: 15, bars: [28,22,12,8],  color: '#BA7517' },
+  { id: 'mild',      name: 'Mild aid user',  desc: 'Behind-the-ear hearing aid', bass: 60, mid: 70, high: 55, treble: 35, bars: [20,26,22,14], color: '#1D9E75' },
+  { id: 'severe',    name: 'Severe loss',    desc: 'Maximum visual boost',      bass: 95, mid: 95, high: 95, treble: 95, bars: [28,28,28,28], color: '#D4537E' },
+];
+
+const AVATAR_COLORS = ['#185FA5','#1D9E75','#BA7517','#D4537E','#534AB7','#7F77DD'];
+
+let profiles = [];
+let activeProfileId = null;
+let selectedPreset = PRESETS[0];
+
+function initProfiles() {
+  try {
+    const saved = localStorage.getItem('audra-profiles');
+    if (saved) {
+      const data = JSON.parse(saved);
+      profiles = data.profiles || [];
+      activeProfileId = data.activeId || null;
+    }
+  } catch(e) {}
+
+  // First run — create a default profile
+  if (profiles.length === 0) {
+    const def = createProfileObj('My Profile', PRESETS[0]);
+    profiles.push(def);
+    activeProfileId = def.id;
+    persistProfiles();
+  }
+
+  if (!profiles.find(p => p.id === activeProfileId)) {
+    activeProfileId = profiles[0].id;
+  }
+
+  renderProfileList();
+  applyProfile(activeProfileId);
+}
+
+function createProfileObj(name, preset) {
+  return {
+    id: Date.now() + Math.random().toString(36).slice(2),
+    name: name.trim() || 'Profile',
+    preset: preset.id,
+    color: AVATAR_COLORS[profiles.length % AVATAR_COLORS.length],
+    bass:   preset.bass,
+    mid:    preset.mid,
+    high:   preset.high,
+    treble: preset.treble,
+  };
+}
+
+function persistProfiles() {
+  try {
+    localStorage.setItem('audra-profiles', JSON.stringify({ profiles, activeId: activeProfileId }));
+  } catch(e) {}
+}
+
+function renderProfileList() {
+  const list = document.getElementById('profileList');
+  list.innerHTML = '';
+
+  profiles.forEach(p => {
+    const isActive = p.id === activeProfileId;
+    const row = document.createElement('div');
+    row.className = 'profile-row-item' + (isActive ? ' active-profile' : '');
+    row.innerHTML = `
+      <div class="p-avatar" style="background:${p.color};">${p.name.charAt(0).toUpperCase()}</div>
+      <div class="p-info">
+        <div class="p-name">${p.name}</div>
+        <div class="p-sub">Bass ${p.bass}% · Mid ${p.mid}% · High ${p.high}% · Treble ${p.treble}%</div>
+      </div>
+      <div class="p-check ${isActive ? 'checked' : ''}"></div>
+      ${profiles.length > 1 ? `<button class="p-delete" onclick="deleteProfile(event,'${p.id}')">×</button>` : ''}
+    `;
+    row.addEventListener('click', () => switchProfile(p.id));
+    list.appendChild(row);
+  });
+
+  const active = profiles.find(p => p.id === activeProfileId);
+  if (active) {
+    document.getElementById('activeProfileLabel').textContent = active.name + ' — settings';
+  }
+}
+
+function switchProfile(id) {
+  activeProfileId = id;
+  persistProfiles();
+  renderProfileList();
+  applyProfile(id);
+  showToast('Switched to ' + profiles.find(p => p.id === id)?.name);
+}
+
+function applyProfile(id) {
+  const p = profiles.find(pr => pr.id === id);
+  if (!p) return;
+  ['bass','mid','high','treble'].forEach(name => {
+    document.getElementById('slider-' + name).value = p[name];
+    updateSliderUI(name, p[name]);
+  });
+}
+
+function deleteProfile(e, id) {
+  e.stopPropagation();
+  if (profiles.length <= 1) { showToast('Need at least one profile'); return; }
+  profiles = profiles.filter(p => p.id !== id);
+  if (activeProfileId === id) activeProfileId = profiles[0].id;
+  persistProfiles();
+  renderProfileList();
+  applyProfile(activeProfileId);
+  showToast('Profile deleted');
+}
+
+// ===================== ADD PROFILE MODAL =====================
+function addProfile() {
+  selectedPreset = PRESETS[0];
+  document.getElementById('profileNameInput').value = '';
+  renderPresetGrid();
+  document.getElementById('profileModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('profileNameInput').focus(), 300);
+}
+
+function closeModal() {
+  document.getElementById('profileModal').style.display = 'none';
+}
+
+function renderPresetGrid() {
+  const grid = document.getElementById('presetGrid');
+  grid.innerHTML = '';
+  PRESETS.forEach(preset => {
+    const chip = document.createElement('div');
+    chip.className = 'preset-chip' + (preset.id === selectedPreset.id ? ' selected-preset' : '');
+    chip.innerHTML = `
+      <div class="preset-bars">
+        ${preset.bars.map((h, i) => `<div class="pb" style="height:${h}px;background:${['#185FA5','#1D9E75','#BA7517','#D4537E'][i]};"></div>`).join('')}
+      </div>
+      <div class="preset-chip-name">${preset.name}</div>
+      <div class="preset-chip-desc">${preset.desc}</div>
+    `;
+    chip.onclick = () => {
+      selectedPreset = preset;
+      renderPresetGrid();
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function saveNewProfile() {
+  const name = document.getElementById('profileNameInput').value.trim();
+  if (!name) { showToast('Give your profile a name'); return; }
+  const p = createProfileObj(name, selectedPreset);
+  profiles.push(p);
+  activeProfileId = p.id;
+  persistProfiles();
+  renderProfileList();
+  applyProfile(p.id);
+  closeModal();
+  showToast('Profile "' + p.name + '" created ✓');
+}
+
+// Close modal on backdrop click
+document.getElementById('profileModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ===================== SLIDERS =====================
 function updateSlider(name, val) {
+  updateSliderUI(name, val);
+  // Save to active profile
+  const p = profiles.find(pr => pr.id === activeProfileId);
+  if (p) {
+    p[name] = parseInt(val);
+    persistProfiles();
+    renderProfileList();
+  }
+}
+
+function updateSliderUI(name, val) {
   const pct = val + '%';
   document.getElementById('fill-' + name).style.width = pct;
   document.getElementById('thumb-' + name).style.left = pct;
   document.getElementById('val-' + name).textContent = val + '%';
-  saveProfile();
 }
 
-function saveProfile() {
-  const profile = {
-    bass:   document.getElementById('slider-bass').value,
-    mid:    document.getElementById('slider-mid').value,
-    high:   document.getElementById('slider-high').value,
-    treble: document.getElementById('slider-treble').value,
-  };
-  try { localStorage.setItem('audra-profile', JSON.stringify(profile)); } catch(e) {}
-}
-
-function loadProfile() {
-  try {
-    const saved = localStorage.getItem('audra-profile');
-    if (!saved) return;
-    const p = JSON.parse(saved);
-    ['bass','mid','high','treble'].forEach(name => {
-      if (p[name] !== undefined) {
-        document.getElementById('slider-' + name).value = p[name];
-        updateSlider(name, p[name]);
-      }
-    });
-    showToast('Profile restored ✓');
-  } catch(e) {}
-}
+function saveProfile() {} // kept for compatibility
+function loadProfile() {} // now handled by initProfiles
 
 // ===================== TOGGLES =====================
 function toggleLayer(name, el) {
