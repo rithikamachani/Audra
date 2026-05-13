@@ -2053,6 +2053,10 @@ async function loadSpotifyTrack(track) {
   const features = await spotifyFetch(`/audio-features/${track.id}`);
   if (features) applySpotifyFeatures(features);
 
+  // Fetch real synced lyrics from LRCLIB
+  const artistName = track.artists[0]?.name || '';
+  loadLyrics(track.name, artistName);
+
   // Load preview audio
   if (track.preview_url) {
     currentPreviewUrl = track.preview_url;
@@ -2159,6 +2163,10 @@ function loadFile(input) {
 
   showToast('Song loaded — press play ▶');
   setStatus('Song loaded', 'var(--green)');
+
+  // Try fetching lyrics from filename
+  const name = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  loadLyrics(name, '');
 }
 
 // ===================== MIC =====================
@@ -2241,7 +2249,164 @@ function fmt(s) {
   return m + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
-// ===================== LYRICS =====================
+// ===================== LYRICS — LRCLIB REAL SYNC =====================
+let syncedLines   = [];   // [{ time: seconds, text: string }]
+let currentLine   = -1;
+let lyricsMode    = 'placeholder'; // 'synced' | 'placeholder'
+let lyricSyncLoop = null;
+
+// Parse LRC format into timed lines
+function parseLRC(lrc) {
+  const lines = [];
+  const regex = /\[(\d+):(\d+)\.(\d+)\]\s*(.+)/g;
+  let match;
+  while ((match = regex.exec(lrc)) !== null) {
+    const mins = parseInt(match[1]);
+    const secs = parseInt(match[2]);
+    const cs   = parseInt(match[3]);
+    const text = match[4].trim();
+    if (text) lines.push({ time: mins * 60 + secs + cs / 100, text });
+  }
+  return lines.sort((a, b) => a.time - b.time);
+}
+
+// Fetch synced lyrics from LRCLIB
+async function fetchLRCLIB(trackName, artistName) {
+  try {
+    const q = encodeURIComponent(trackName + ' ' + artistName);
+    const res = await fetch(`https://lrclib.net/api/search?q=${q}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.length) return null;
+
+    // Find best match with synced lyrics
+    const match = data.find(r => r.syncedLyrics) || data[0];
+    if (!match) return null;
+
+    // Fetch full record for synced lyrics
+    const detail = await fetch(`https://lrclib.net/api/get/${match.id}`);
+    if (!detail.ok) return null;
+    const song = await detail.json();
+    return song.syncedLyrics || song.plainLyrics || null;
+  } catch(e) { return null; }
+}
+
+// Load lyrics for a track
+async function loadLyrics(trackName, artistName) {
+  // Reset
+  syncedLines = [];
+  currentLine = -1;
+  lyricsMode  = 'placeholder';
+  stopLyricSync();
+
+  const lyricsLine = document.getElementById('lyricsLine');
+  lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;">Fetching lyrics...</span>';
+
+  const result = await fetchLRCLIB(trackName, artistName);
+
+  if (!result) {
+    lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;">No lyrics found — playing without sync</span>';
+    startPlaceholderLyrics();
+    return;
+  }
+
+  if (result.includes('[')) {
+    // Synced LRC format
+    syncedLines = parseLRC(result);
+    lyricsMode  = 'synced';
+    showToast('Synced lyrics loaded ✓');
+    renderSyncedLine(-1);
+    startLyricSync();
+  } else {
+    // Plain text — split into lines, show statically
+    const lines = result.split('\n').filter(l => l.trim());
+    syncedLines = lines.map((text, i) => ({ time: i * 4, text }));
+    lyricsMode  = 'synced';
+    showToast('Lyrics loaded ✓');
+    renderSyncedLine(0);
+    startLyricSync();
+  }
+}
+
+// Render the active synced line with word animations
+function renderSyncedLine(idx) {
+  const container = document.getElementById('lyricsLine');
+  container.innerHTML = '';
+  lyricWords = [];
+
+  if (idx < 0 || idx >= syncedLines.length) {
+    container.innerHTML = '<span style="color:var(--text3);font-size:12px;font-style:italic;">♪</span>';
+    return;
+  }
+
+  const line = syncedLines[idx];
+  const words = line.text.split(' ');
+
+  // Upcoming line preview
+  if (idx + 1 < syncedLines.length) {
+    const preview = document.createElement('div');
+    preview.style.cssText = 'font-size:11px;color:var(--text3);margin-bottom:6px;font-style:italic;';
+    preview.textContent = syncedLines[idx + 1].text;
+    container.appendChild(preview);
+  }
+
+  // Current line words
+  const lineEl = document.createElement('div');
+  words.forEach((w, i) => {
+    const span = document.createElement('span');
+    span.className = 'lword';
+    span.textContent = w;
+    lineEl.appendChild(span);
+    if (i < words.length - 1) lineEl.appendChild(document.createTextNode(' '));
+    lyricWords.push(span);
+  });
+  container.appendChild(lineEl);
+
+  // Animate words within the line timed to next line
+  const nextTime = syncedLines[idx + 1]?.time;
+  const lineDur  = nextTime ? (nextTime - line.time) : 3;
+  const wordDelay = (lineDur * 1000) / (words.length + 1);
+
+  lyricWords.forEach((span, i) => {
+    setTimeout(() => {
+      lyricWords.forEach(s => s.classList.remove('active', 'sung'));
+      lyricWords.slice(0, i).forEach(s => s.classList.add('sung'));
+      span.classList.add('active');
+    }, wordDelay * (i + 1));
+  });
+}
+
+// Main sync loop — watches audio.currentTime
+function startLyricSync() {
+  stopLyricSync();
+  lyricSyncLoop = setInterval(() => {
+    if (!audioEl || !isPlaying || lyricsMode !== 'synced') return;
+    const t = audioEl.currentTime;
+
+    // Find current line
+    let idx = -1;
+    for (let i = 0; i < syncedLines.length; i++) {
+      if (syncedLines[i].time <= t) idx = i;
+      else break;
+    }
+
+    if (idx !== currentLine) {
+      currentLine = idx;
+      renderSyncedLine(idx);
+    }
+  }, 100); // check every 100ms
+}
+
+function stopLyricSync() {
+  if (lyricSyncLoop) { clearInterval(lyricSyncLoop); lyricSyncLoop = null; }
+}
+
+// Placeholder fallback (used when no lyrics found)
+function startPlaceholderLyrics() {
+  lyricsMode = 'placeholder';
+  startLyrics();
+}
+
 function buildLyrics(line) {
   const container = document.getElementById('lyricsLine');
   container.innerHTML = '';
@@ -2259,6 +2424,7 @@ function buildLyrics(line) {
 }
 
 function startLyrics() {
+  if (lyricsMode === 'synced') return; // don't override real sync
   if (lyricTimer) clearInterval(lyricTimer);
   let lineIdx = 0, wordIdx = 0;
   buildLyrics(LYRICS[lineIdx]);
