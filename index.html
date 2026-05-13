@@ -561,6 +561,82 @@ input[type=range] {
 }
 .freq-readout { font-size: 9px; font-family: var(--mono); color: var(--text3); white-space: nowrap; }
 
+/* ===================== VISUAL SHEET MUSIC ===================== */
+.score-card { padding: 0; overflow: hidden; }
+
+.score-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.score-info { flex: 1; }
+.score-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.score-sub { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+
+.score-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--bg3); border: 0.5px solid var(--border);
+  color: var(--text2); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.15s;
+}
+.score-btn:hover { background: var(--surface); }
+
+.score-canvas {
+  display: block;
+  width: 100%; height: 180px;
+  background: var(--bg);
+}
+
+.score-legend {
+  display: flex; justify-content: center; gap: 16px;
+  padding: 10px 16px;
+  border-top: 0.5px solid var(--border);
+}
+
+.score-legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--text3); font-family: var(--mono);
+}
+
+.score-legend-dot {
+  width: 8px; height: 8px; border-radius: 2px;
+}
+
+.read-guide { display: flex; flex-direction: column; gap: 0; }
+
+.read-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.read-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.read-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+
+.read-body { flex: 1; }
+.read-title { font-size: 12px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.read-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+.live-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.live-stat {
+  padding: 12px 8px;
+  text-align: center;
+  border-right: 0.5px solid var(--border);
+}
+.live-stat:last-child { border-right: none; }
+
+.live-stat-val { font-size: 13px; font-weight: 600; color: var(--text); font-family: var(--mono); margin-bottom: 3px; }
+.live-stat-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+
 /* ===================== MULTI-PROFILE ===================== */
 .profile-row-item {
   display: flex; align-items: center; gap: 12px;
@@ -1177,6 +1253,7 @@ input[type=range] {
   <!-- NAV TABS -->
   <div class="nav-tabs">
     <button class="tab active" onclick="switchTab('now', this)">Now Playing</button>
+    <button class="tab" onclick="switchTab('score', this)">Score</button>
     <button class="tab" onclick="switchTab('emotion', this)">Emotion</button>
     <button class="tab" onclick="switchTab('profile', this)">Profile</button>
     <button class="tab" onclick="switchTab('about', this)">About</button>
@@ -1283,6 +1360,95 @@ input[type=range] {
               <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Mid</div>
               <div class="legend-item"><div class="legend-dot" style="background:var(--amber);"></div>High</div>
               <div class="legend-item"><div class="legend-dot" style="background:var(--coral);"></div>Treble</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VISUAL SHEET MUSIC PANEL -->
+    <div class="panel" id="panel-score">
+
+      <div>
+        <div class="section-label">Visual Score</div>
+        <div class="card score-card">
+          <div class="score-header">
+            <div class="score-info">
+              <div class="score-title" id="scoreTrackTitle">No song playing</div>
+              <div class="score-sub">Pitch → height · Loudness → thickness · Color → frequency band</div>
+            </div>
+            <div class="score-controls">
+              <button class="score-btn" onclick="clearScore()" title="Clear score">↺</button>
+            </div>
+          </div>
+          <canvas id="scoreCanvas" class="score-canvas"></canvas>
+          <div class="score-legend">
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:var(--blue);"></div>Bass</div>
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:var(--green);"></div>Mid</div>
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:var(--amber);"></div>High</div>
+            <div class="score-legend-item"><div class="score-legend-dot" style="background:var(--coral);"></div>Treble</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How to read it -->
+      <div>
+        <div class="section-label">How to read it</div>
+        <div class="card" style="padding:16px;">
+          <div class="read-guide">
+            <div class="read-item">
+              <div class="read-icon" style="background:#E6F1FB;">↕</div>
+              <div class="read-body">
+                <div class="read-title">Height = Pitch</div>
+                <div class="read-desc">Tall bars are high notes. Short bars are low notes. A melody climbing up looks like bars growing taller.</div>
+              </div>
+            </div>
+            <div class="read-item">
+              <div class="read-icon" style="background:#FAEEDA;">⬛</div>
+              <div class="read-body">
+                <div class="read-title">Thickness = Loudness</div>
+                <div class="read-desc">Wide bars are loud moments. Thin bars are quiet. A chorus hits — everything gets thicker at once.</div>
+              </div>
+            </div>
+            <div class="read-item">
+              <div class="read-icon" style="background:#E1F5EE;">🎨</div>
+              <div class="read-body">
+                <div class="read-title">Color = Frequency band</div>
+                <div class="read-desc">Blue is bass. Green is mid. Amber is high. Coral is treble. Each layer of the music gets its own color lane.</div>
+              </div>
+            </div>
+            <div class="read-item" style="border-bottom:none;">
+              <div class="read-icon" style="background:#FAECE7;">→</div>
+              <div class="read-body">
+                <div class="read-title">Time moves left</div>
+                <div class="read-desc">The score scrolls right to left. The rightmost bars are the current moment. Left is the past. You can see the shape of the song building over time.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live stats -->
+      <div>
+        <div class="section-label">Live reading</div>
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="live-stats">
+            <div class="live-stat">
+              <div class="live-stat-val" id="statPitch">— Hz</div>
+              <div class="live-stat-label">Peak pitch</div>
+            </div>
+            <div class="live-stat">
+              <div class="live-stat-val" id="statLoudness">—</div>
+              <div class="live-stat-label">Loudness</div>
+            </div>
+            <div class="live-stat">
+              <div class="live-stat-val" id="statDominant">—</div>
+              <div class="live-stat-label">Dominant band</div>
+            </div>
+            <div class="live-stat">
+              <div class="live-stat-val" id="statTempo">— BPM</div>
+              <div class="live-stat-label">Est. tempo</div>
             </div>
           </div>
         </div>
@@ -2173,6 +2339,7 @@ function draw(ts = 0) {
   if (layers.viz) drawWave(timeData, freqData, intensity);
   if (layers.grid) drawGrid(bass, mid, high, treb, ts);
   if (layers.emotion) drawEmotion(bass, mid, high, treb);
+  drawScore(bass, mid, high, treb, intensity, freqData);
 }
 
 // ===================== SCREEN FLASH =====================
@@ -2373,6 +2540,140 @@ function setMood(mood) {
     emotionBlobs[1].color = m.colors[1];
     emotionBlobs[2].color = m.colors[0] + 'CC';
   }
+}
+
+// ===================== VISUAL SHEET MUSIC =====================
+let scoreColumns = [];
+let scoreTempo = 0, scoreBeatTimes = [], lastBeatVal = 0;
+const MAX_SCORE_COLS = 120;
+
+function drawScore(bass, mid, high, treb, intensity, freqData) {
+  const canvas = document.getElementById('scoreCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth * devicePixelRatio;
+  const H = 180 * devicePixelRatio;
+  if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+
+  // Detect pitch peak
+  let peakIdx = 0, peakVal = 0;
+  for (let i = 1; i < freqData.length / 2; i++) {
+    if (freqData[i] > peakVal) { peakVal = freqData[i]; peakIdx = i; }
+  }
+  const pitchHz = Math.round(peakIdx * (audioCtx?.sampleRate || 44100) / (analyser?.fftSize || 2048));
+
+  // Beat / tempo detection
+  if (bass > 0.55 && lastBeatVal < 0.55) {
+    const now = performance.now();
+    scoreBeatTimes.push(now);
+    if (scoreBeatTimes.length > 8) scoreBeatTimes.shift();
+    if (scoreBeatTimes.length >= 2) {
+      const gaps = [];
+      for (let i = 1; i < scoreBeatTimes.length; i++) gaps.push(scoreBeatTimes[i] - scoreBeatTimes[i-1]);
+      const avgGap = gaps.reduce((a,b) => a+b, 0) / gaps.length;
+      scoreTempo = Math.round(60000 / avgGap);
+    }
+  }
+  lastBeatVal = bass;
+
+  // Store column
+  scoreColumns.push({ bass, mid, high, treb, intensity, pitch: peakVal / 255 });
+  if (scoreColumns.length > MAX_SCORE_COLS) scoreColumns.shift();
+
+  // Update live stats
+  const dominant = bass > mid && bass > high && bass > treb ? 'Bass'
+    : mid > high && mid > treb ? 'Mid'
+    : high > treb ? 'High' : 'Treble';
+  document.getElementById('statPitch').textContent = pitchHz > 0 ? pitchHz + ' Hz' : '— Hz';
+  document.getElementById('statLoudness').textContent = Math.round(intensity * 100) + '%';
+  document.getElementById('statDominant').textContent = dominant;
+  document.getElementById('statTempo').textContent = scoreTempo > 30 && scoreTempo < 300 ? scoreTempo + ' BPM' : '— BPM';
+
+  // Update score track title
+  const t = document.getElementById('trackTitle')?.textContent;
+  if (t && t !== 'No song loaded') document.getElementById('scoreTrackTitle').textContent = t;
+
+  // Draw background
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = isDark ? '#0D0C0A' : '#F4F1EC';
+  ctx.fillRect(0, 0, W, H);
+
+  // Center line
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+
+  // Draw columns
+  const colW = W / MAX_SCORE_COLS;
+  const colors = {
+    bass:   isDark ? '#3B8BDD' : '#185FA5',
+    mid:    isDark ? '#1D9E75' : '#0F6E56',
+    high:   isDark ? '#D4880A' : '#8A5300',
+    treb:   isDark ? '#D4537E' : '#99203E',
+  };
+
+  scoreColumns.forEach((col, i) => {
+    const x = i * colW;
+    const bands = [
+      { val: col.bass,  color: colors.bass,  lane: 0 },
+      { val: col.mid,   color: colors.mid,   lane: 1 },
+      { val: col.high,  color: colors.high,  lane: 2 },
+      { val: col.treb,  color: colors.treb,  lane: 3 },
+    ];
+
+    bands.forEach(({ val, color, lane }) => {
+      if (val < 0.05) return;
+
+      // Height = pitch mapped per band
+      const maxH = (H / 4) * 0.85;
+      const barH = Math.max(3, val * maxH);
+
+      // Thickness = loudness (col width varies)
+      const thickness = Math.max(colW * 0.4, colW * (0.4 + col.intensity * 0.6));
+
+      // Y position — each band has its own lane
+      const laneH = H / 4;
+      const laneTop = lane * laneH;
+      const barY = laneTop + laneH - barH;
+
+      // Color with intensity-driven opacity
+      ctx.globalAlpha = 0.3 + val * 0.7;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect
+        ? ctx.roundRect(x, barY, thickness, barH, 2)
+        : ctx.rect(x, barY, thickness, barH);
+      ctx.fill();
+    });
+  });
+
+  ctx.globalAlpha = 1;
+
+  // Playhead line at right edge
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(W - 2, 0);
+  ctx.lineTo(W - 2, H);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function clearScore() {
+  scoreColumns = [];
+  scoreBeatTimes = [];
+  scoreTempo = 0;
+  const canvas = document.getElementById('scoreCanvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  document.getElementById('statPitch').textContent = '— Hz';
+  document.getElementById('statLoudness').textContent = '—';
+  document.getElementById('statDominant').textContent = '—';
+  document.getElementById('statTempo').textContent = '— BPM';
+  showToast('Score cleared');
 }
 
 // ===================== MULTI-PROFILE SYSTEM =====================
