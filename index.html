@@ -1706,35 +1706,85 @@ let spotifyToken = null;
 let searchTimeout = null;
 let currentPreviewUrl = null;
 
-// Get token via implicit grant (no backend needed)
-function getSpotifyToken() {
-  // Check if token is in URL hash (after redirect)
-  const hash = window.location.hash;
-  if (hash) {
-    const params = new URLSearchParams(hash.substring(1));
-    const token = params.get('access_token');
-    if (token) {
-      spotifyToken = token;
-      window.location.hash = '';
-      showToast('Spotify connected ✓');
-      return;
-    }
+// PKCE helpers
+function generateRandomString(length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+  return result;
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function loginSpotify() {
+  const verifier  = generateRandomString(128);
+  const challenge = await generateCodeChallenge(verifier);
+  localStorage.setItem('audra-pkce-verifier', verifier);
+
+  const params = new URLSearchParams({
+    client_id:             SPOTIFY_CLIENT_ID,
+    response_type:         'code',
+    redirect_uri:          SPOTIFY_REDIRECT,
+    scope:                 'user-read-private user-read-email',
+    code_challenge_method: 'S256',
+    code_challenge:        challenge,
+  });
+
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+async function exchangeCodeForToken(code) {
+  const verifier = localStorage.getItem('audra-pkce-verifier');
+  if (!verifier) return;
+
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id:     SPOTIFY_CLIENT_ID,
+      grant_type:    'authorization_code',
+      code,
+      redirect_uri:  SPOTIFY_REDIRECT,
+      code_verifier: verifier,
+    }),
+  });
+
+  const data = await res.json();
+  if (data.access_token) {
+    spotifyToken = data.access_token;
+    localStorage.setItem('audra-spotify-token', data.access_token);
+    localStorage.setItem('audra-spotify-exp', Date.now() + (data.expires_in * 1000));
+    localStorage.removeItem('audra-pkce-verifier');
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    showToast('Spotify connected ✓');
   }
-  // Check localStorage
+}
+
+async function getSpotifyToken() {
+  // Check if returning from Spotify auth with a code
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    await exchangeCodeForToken(code);
+    return;
+  }
+
+  // Check saved token
   const saved = localStorage.getItem('audra-spotify-token');
   const exp   = localStorage.getItem('audra-spotify-exp');
   if (saved && exp && Date.now() < parseInt(exp)) {
     spotifyToken = saved;
+    showToast('Spotify ready ✓');
     return;
   }
-  // Need to authenticate
-  spotifyToken = null;
-}
 
-function loginSpotify() {
-  const scopes = 'streaming user-read-email user-read-private';
-  const url = `https://accounts.spotify.com/authorize?client_id=${SPOTIFY_CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(SPOTIFY_REDIRECT)}&scope=${encodeURIComponent(scopes)}&show_dialog=true`;
-  window.location.href = url;
+  spotifyToken = null;
 }
 
 async function spotifyFetch(endpoint) {
@@ -1904,7 +1954,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startEmotionCanvas();
   setMood('calm');
   initProfiles();
-  getSpotifyToken(); // check for Spotify auth token
+  getSpotifyToken(); // PKCE auth check
 });
 
 // ===================== AUDIO CONTEXT =====================
