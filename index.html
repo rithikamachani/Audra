@@ -836,6 +836,98 @@ input[type=range] {
 .panel.active > *:nth-child(3) { animation-delay: 0.1s; }
 .panel.active > *:nth-child(4) { animation-delay: 0.15s; }
 
+/* ===================== SPOTIFY SEARCH ===================== */
+.spotify-search-wrap {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.search-input-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+}
+
+.search-input {
+  flex: 1; border: none; background: transparent;
+  font-family: var(--font); font-size: 13px;
+  color: var(--text); outline: none;
+}
+.search-input::placeholder { color: var(--text3); }
+
+.search-spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.search-results {
+  border-top: 0.5px solid var(--border);
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.result-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 0.5px solid var(--border);
+}
+.result-row:last-child { border-bottom: none; }
+.result-row:hover { background: var(--bg3); }
+.result-row.playing { background: rgba(59,139,221,0.08); }
+
+.result-art {
+  width: 38px; height: 38px;
+  border-radius: 6px;
+  background: var(--bg3);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.result-art img { width: 100%; height: 100%; object-fit: cover; }
+
+.result-info { flex: 1; min-width: 0; }
+.result-title {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.result-artist { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+.result-duration { font-size: 10px; color: var(--text3); font-family: var(--mono); flex-shrink: 0; }
+
+.result-preview-badge {
+  font-size: 9px; font-weight: 500;
+  padding: 2px 6px; border-radius: 10px;
+  background: rgba(29,158,117,0.12); color: var(--green);
+  flex-shrink: 0;
+}
+
+.no-results {
+  padding: 16px; text-align: center;
+  font-size: 12px; color: var(--text3);
+}
+
+.file-fallback {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px;
+  font-size: 11px; color: var(--text3);
+  cursor: pointer; padding: 6px 2px;
+  transition: color 0.15s;
+}
+.file-fallback:hover { color: var(--text2); }
+
+.spotify-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 9px; color: var(--text3);
+  font-family: var(--mono); padding: 6px 14px;
+  border-top: 0.5px solid var(--border);
+}
+
 /* ===================== FLASH OVERLAY ===================== */
 #flashOverlay {
   position: fixed;
@@ -1096,13 +1188,27 @@ input[type=range] {
     <!-- NOW PLAYING PANEL -->
     <div class="panel active" id="panel-now">
 
-      <!-- Upload -->
+      <!-- Spotify Search -->
       <div>
-        <div class="section-label">Song</div>
-        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-          <div class="upload-icon">🎵</div>
-          <div class="upload-title" id="uploadTitle">Load a song</div>
-          <div class="upload-sub">Click to choose an audio file from your device</div>
+        <div class="section-label">Search</div>
+        <div class="spotify-search-wrap">
+          <div class="search-input-row">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;">
+              <circle cx="6" cy="6" r="4" stroke="var(--text3)" stroke-width="1.5"/>
+              <path d="M9 9l3 3" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input type="text" id="spotifySearch" class="search-input" placeholder="Search any song..." oninput="onSearchInput(this.value)" autocomplete="off"/>
+            <div id="searchSpinner" class="search-spinner" style="display:none;"></div>
+          </div>
+          <div id="searchResults" class="search-results" style="display:none;"></div>
+        </div>
+        <!-- Fallback file upload -->
+        <div class="file-fallback" onclick="document.getElementById('fileInput').click()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1v7M3 5l3-4 3 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 9v1a1 1 0 001 1h8a1 1 0 001-1V9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Upload a file instead
         </div>
         <input type="file" id="fileInput" accept="audio/*" onchange="loadFile(this)"/>
       </div>
@@ -1112,10 +1218,11 @@ input[type=range] {
         <div class="section-label">Track</div>
         <div class="card">
           <div class="now-playing">
-            <div class="album-art">
+            <div class="album-art" id="albumArt">
               <div class="art-ring" style="width:16px;height:16px;top:20px;left:20px;--d:1.8s;"></div>
               <div class="art-ring" style="width:30px;height:30px;top:13px;left:13px;--d:2.4s;"></div>
               <div class="art-ring" style="width:46px;height:46px;top:5px;left:5px;--d:3.0s;"></div>
+              <img id="albumImg" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:12px;position:absolute;inset:0;"/>
             </div>
             <div class="track-info">
               <div class="track-title" id="trackTitle">No song loaded</div>
@@ -1592,6 +1699,197 @@ const MOODS = {
   nostalgic: { colors: ['#7F77DD','#3B8BDD'], label: 'Nostalgic · Warm · Distant', desc: 'Slower tempo with rich harmonic texture. The frequencies your grandfather\'s hearing aid works hardest to preserve.' },
 };
 
+// ===================== SPOTIFY =====================
+const SPOTIFY_CLIENT_ID = 'edb9e5f7fc1b4061b5a00b2dadb04a49';
+const SPOTIFY_REDIRECT   = 'https://rithikamachani.github.io/Audra/';
+let spotifyToken = null;
+let searchTimeout = null;
+let currentPreviewUrl = null;
+
+// Get token via implicit grant (no backend needed)
+function getSpotifyToken() {
+  // Check if token is in URL hash (after redirect)
+  const hash = window.location.hash;
+  if (hash) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if (token) {
+      spotifyToken = token;
+      window.location.hash = '';
+      showToast('Spotify connected ✓');
+      return;
+    }
+  }
+  // Check localStorage
+  const saved = localStorage.getItem('audra-spotify-token');
+  const exp   = localStorage.getItem('audra-spotify-exp');
+  if (saved && exp && Date.now() < parseInt(exp)) {
+    spotifyToken = saved;
+    return;
+  }
+  // Need to authenticate
+  spotifyToken = null;
+}
+
+function loginSpotify() {
+  const scopes = 'streaming user-read-email user-read-private';
+  const url = `https://accounts.spotify.com/authorize?client_id=${SPOTIFY_CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(SPOTIFY_REDIRECT)}&scope=${encodeURIComponent(scopes)}&show_dialog=true`;
+  window.location.href = url;
+}
+
+async function spotifyFetch(endpoint) {
+  if (!spotifyToken) return null;
+  try {
+    const res = await fetch('https://api.spotify.com/v1' + endpoint, {
+      headers: { 'Authorization': 'Bearer ' + spotifyToken }
+    });
+    if (res.status === 401) { spotifyToken = null; return null; }
+    return await res.json();
+  } catch(e) { return null; }
+}
+
+// Search input handler
+let searchDebounce = null;
+function onSearchInput(val) {
+  clearTimeout(searchDebounce);
+  const results = document.getElementById('searchResults');
+  const spinner = document.getElementById('searchSpinner');
+
+  if (!val.trim()) { results.style.display = 'none'; return; }
+
+  // Need Spotify login
+  if (!spotifyToken) {
+    results.style.display = 'block';
+    results.innerHTML = `<div class="no-results">
+      <div style="margin-bottom:8px;">Connect Spotify to search any song</div>
+      <button onclick="loginSpotify()" style="background:var(--green);color:white;border:none;padding:8px 18px;border-radius:20px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;">Connect Spotify</button>
+    </div>`;
+    return;
+  }
+
+  spinner.style.display = 'block';
+  searchDebounce = setTimeout(async () => {
+    const data = await spotifyFetch(`/search?q=${encodeURIComponent(val)}&type=track&limit=6`);
+    spinner.style.display = 'none';
+    if (!data || !data.tracks || !data.tracks.items.length) {
+      results.style.display = 'block';
+      results.innerHTML = '<div class="no-results">No results found</div>';
+      return;
+    }
+    renderResults(data.tracks.items);
+  }, 400);
+}
+
+function renderResults(tracks) {
+  const results = document.getElementById('searchResults');
+  results.style.display = 'block';
+  results.innerHTML = '';
+
+  tracks.forEach(track => {
+    const row = document.createElement('div');
+    row.className = 'result-row';
+    const art = track.album.images[2]?.url || track.album.images[0]?.url || '';
+    const mins = Math.floor(track.duration_ms / 60000);
+    const secs = Math.floor((track.duration_ms % 60000) / 1000);
+    const hasPreview = !!track.preview_url;
+
+    row.innerHTML = `
+      <div class="result-art"><img src="${art}" alt="${track.name}" loading="lazy"/></div>
+      <div class="result-info">
+        <div class="result-title">${track.name}</div>
+        <div class="result-artist">${track.artists.map(a => a.name).join(', ')} · ${track.album.name}</div>
+      </div>
+      ${hasPreview ? '<span class="result-preview-badge">Preview</span>' : ''}
+      <div class="result-duration">${mins}:${secs.toString().padStart(2,'0')}</div>
+    `;
+
+    row.onclick = () => loadSpotifyTrack(track);
+    results.appendChild(row);
+  });
+
+  // Spotify attribution
+  const badge = document.createElement('div');
+  badge.className = 'spotify-badge';
+  badge.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="#1D9E75"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+    Powered by Spotify`;
+  results.appendChild(badge);
+}
+
+async function loadSpotifyTrack(track) {
+  // Update now playing UI
+  document.getElementById('trackTitle').textContent = track.name;
+  document.getElementById('trackArtist').textContent = track.artists.map(a => a.name).join(', ');
+
+  // Show album art
+  const img = document.getElementById('albumImg');
+  const artUrl = track.album.images[0]?.url;
+  if (artUrl) {
+    img.src = artUrl;
+    img.style.display = 'block';
+    document.querySelectorAll('.art-ring').forEach(r => r.style.display = 'none');
+  }
+
+  // Close search results
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('spotifySearch').value = track.name;
+
+  // Auto-set emotion map from audio features
+  const features = await spotifyFetch(`/audio-features/${track.id}`);
+  if (features) applySpotifyFeatures(features);
+
+  // Load preview audio
+  if (track.preview_url) {
+    currentPreviewUrl = track.preview_url;
+    ensureAudioCtx();
+    if (audioEl) { audioEl.pause(); audioEl.src = ''; }
+    audioEl = new Audio();
+    audioEl.crossOrigin = 'anonymous';
+    audioEl.src = track.preview_url;
+    audioEl.addEventListener('timeupdate', updateProgress);
+    audioEl.addEventListener('ended', () => {
+      isPlaying = false; updatePlayBtn();
+      setStatus('Preview ended', 'var(--text3)');
+    });
+    if (source) { try { source.disconnect(); } catch(e){} }
+    source = audioCtx.createMediaElementSource(audioEl);
+    source.connect(analyser);
+    audioEl.play();
+    isPlaying = true;
+    updatePlayBtn();
+    setStatus('Playing preview · 30s', 'var(--green)');
+    startDraw();
+    startLyrics();
+    showToast('Playing 30s preview ▶');
+  } else {
+    showToast('No preview available for this song');
+    setStatus('No preview — try another song', 'var(--amber)');
+  }
+}
+
+function applySpotifyFeatures(f) {
+  // Map Spotify features to Audra emotion moods
+  const energy   = f.energy   || 0.5;
+  const valence  = f.valence  || 0.5;
+  const tempo    = f.tempo    || 120;
+  const acoustic = f.acousticness || 0.5;
+
+  let mood = 'calm';
+  if (energy > 0.7 && valence > 0.6) mood = 'energetic';
+  else if (valence > 0.6 && energy < 0.6) mood = 'uplifting';
+  else if (valence < 0.4 && acoustic > 0.5) mood = 'tender';
+  else if (acoustic > 0.6 && energy < 0.5) mood = 'nostalgic';
+  else if (energy < 0.4) mood = 'calm';
+
+  // Update mood chips UI
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+  const moodMap = { calm: 0, uplifting: 1, tender: 2, energetic: 3, nostalgic: 4 };
+  const chips = document.querySelectorAll('.mood-chip');
+  if (chips[moodMap[mood]]) chips[moodMap[mood]].classList.add('active');
+
+  setMood(mood);
+  showToast(`Emotion: ${mood} — from Spotify data`);
+}
+
 // ===================== SPLASH =====================
 function dismissSplash() {
   const splash = document.getElementById('splash');
@@ -1605,7 +1903,8 @@ document.addEventListener('DOMContentLoaded', () => {
   buildLyrics(LYRICS[0]);
   startEmotionCanvas();
   setMood('calm');
-  initProfiles(); // load or create profiles, apply active one
+  initProfiles();
+  getSpotifyToken(); // check for Spotify auth token
 });
 
 // ===================== AUDIO CONTEXT =====================
