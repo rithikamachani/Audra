@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-/* Base setup */
+/* ===================== RESET & TOKENS ===================== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
 
@@ -57,7 +57,7 @@ body {
   transition: background var(--transition), color var(--transition);
 }
 
-/* layout */
+/* ===================== LAYOUT ===================== */
 .app-shell {
   max-width: 420px;
   margin: 0 auto;
@@ -67,8 +67,8 @@ body {
   position: relative;
 }
 
-/* top bar */
-  .top-bar {
+/* ===================== TOP BAR ===================== */
+.top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,7 +131,7 @@ body {
   50% { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* nav tabs */
+/* ===================== NAV TABS ===================== */
 .nav-tabs {
   display: flex;
   padding: 12px 20px 0;
@@ -161,7 +161,7 @@ body {
   border-color: var(--border);
 }
 
-/* panels */
+/* ===================== PANELS ===================== */
 .panels {
   flex: 1;
   background: var(--bg2);
@@ -172,7 +172,7 @@ body {
 .panel { display: none; }
 .panel.active { display: flex; flex-direction: column; gap: 16px; }
 
-/* section labels */
+/* ===================== SECTION LABELS ===================== */
 .section-label {
   font-size: 10px;
   font-weight: 500;
@@ -183,7 +183,7 @@ body {
   margin-bottom: 8px;
 }
 
-/*card */
+/* ===================== CARD ===================== */
 .card {
   background: var(--surface);
   border: 0.5px solid var(--border);
@@ -191,7 +191,7 @@ body {
   overflow: hidden;
 }
 
-/* now playing card */
+/* ===================== NOW PLAYING CARD ===================== */
 .now-playing {
   padding: 16px;
   display: flex;
@@ -241,7 +241,7 @@ body {
 }
 .ctrl-play:hover { opacity: 0.88; }
 
-/* wavefork */
+/* ===================== WAVEFORM ===================== */
 .waveform-wrap {
   padding: 0 16px 16px;
 }
@@ -254,7 +254,7 @@ body {
   display: block;
 }
 
-/* lyrics */
+/* ===================== LYRICS ===================== */
 .lyrics-wrap { padding: 16px; }
 
 .lyrics-line {
@@ -312,7 +312,7 @@ body {
   font-family: var(--mono); white-space: nowrap;
 }
 
-/* rhythm grid */
+/* ===================== RHYTHM GRID ===================== */
 .grid-wrap { padding: 16px; }
 
 .beat-grid {
@@ -344,7 +344,7 @@ body {
   width: 6px; height: 6px; border-radius: 1px;
 }
 
-/* emotion panel */
+/* ===================== EMOTION PANEL ===================== */
 .emotion-canvas-wrap {
   position: relative;
   height: 180px;
@@ -385,7 +385,7 @@ body {
 .mood-chip:hover { opacity: 0.8; }
 .mood-chip.active { border-color: currentColor; }
 
-/* profile panel */
+/* ===================== PROFILE PANEL ===================== */
 .profile-header {
   padding: 16px;
   display: flex;
@@ -510,7 +510,7 @@ input[type=range] {
 }
 .toggle-switch.on .toggle-knob { transform: translateX(16px); }
 
-/* status bar */
+/* ===================== STATUS BAR ===================== */
 .status-bar {
   padding: 10px 20px;
   background: var(--bg);
@@ -527,7 +527,7 @@ input[type=range] {
 
 .status-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-/* upload area */
+/* ===================== UPLOAD AREA ===================== */
 .upload-area {
   border: 1.5px dashed var(--border);
   border-radius: var(--radius);
@@ -542,7 +542,7 @@ input[type=range] {
 .upload-sub { font-size: 11px; color: var(--text2); }
 #fileInput { display: none; }
 
-/* intensity meter */
+/* ===================== INTENSITY METER ===================== */
 .intensity-wrap {
   padding: 12px 16px;
   border-top: 0.5px solid var(--border);
@@ -987,6 +987,23 @@ input[type=range] {
   padding: 16px; text-align: center;
   font-size: 12px; color: var(--text3);
 }
+
+.error-state {
+  padding: 16px 18px;
+}
+
+.error-icon { font-size: 20px; margin-bottom: 6px; }
+.error-msg { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+.error-sub { font-size: 11px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+
+.error-retry-btn {
+  font-size: 11px; padding: 6px 16px;
+  border-radius: 20px;
+  background: var(--blue); color: white;
+  border: none; cursor: pointer;
+  font-family: var(--font); font-weight: 500;
+}
+.error-retry-btn:hover { opacity: 0.88; }
 
 .file-fallback {
   display: flex; align-items: center; gap: 6px;
@@ -1488,6 +1505,27 @@ input[type=range] {
     <!-- PROFILE PANEL -->
     <div class="panel" id="panel-profile">
 
+      <!-- Spotify Status -->
+      <div>
+        <div class="section-label">Spotify</div>
+        <div class="card" id="spotifyStatusCard" style="padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div id="spotifyStatusDot" style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div id="spotifyStatusText" style="font-size:12px;font-weight:500;color:var(--text);">Not connected</div>
+              <div id="spotifyStatusSub" style="font-size:10px;color:var(--text2);margin-top:2px;">Connect Spotify to search any song</div>
+            </div>
+            <button id="spotifyConnectBtn" onclick="loginSpotify()" style="font-size:11px;padding:5px 12px;border-radius:20px;background:var(--blue);color:white;border:none;cursor:pointer;font-family:var(--font);font-weight:500;">Connect</button>
+          </div>
+          <div id="spotifyQuotaNote" style="display:none;margin-top:10px;padding:8px 10px;background:var(--bg3);border-radius:8px;border:0.5px solid var(--border);">
+            <div style="font-size:11px;color:var(--text2);line-height:1.6;">
+              ⚠️ <strong>Development mode</strong> — only manually added users can connect. To open Audra to everyone, apply for extended quota on your
+              <span style="color:var(--blue);cursor:pointer;" onclick="window.open('https://developer.spotify.com/dashboard','_blank')">Spotify Developer Dashboard</span>.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Profile Switcher -->
       <div>
         <div class="section-label">Profiles</div>
@@ -1938,6 +1976,7 @@ async function getSpotifyToken() {
   const code = params.get('code');
   if (code) {
     await exchangeCodeForToken(code);
+    updateSpotifyStatus();
     return;
   }
 
@@ -1946,11 +1985,39 @@ async function getSpotifyToken() {
   const exp   = localStorage.getItem('audra-spotify-exp');
   if (saved && exp && Date.now() < parseInt(exp)) {
     spotifyToken = saved;
-    showToast('Spotify ready ✓');
+    updateSpotifyStatus();
     return;
   }
 
   spotifyToken = null;
+  updateSpotifyStatus();
+}
+
+function updateSpotifyStatus() {
+  const dot  = document.getElementById('spotifyStatusDot');
+  const text = document.getElementById('spotifyStatusText');
+  const sub  = document.getElementById('spotifyStatusSub');
+  const btn  = document.getElementById('spotifyConnectBtn');
+  const note = document.getElementById('spotifyQuotaNote');
+  if (!dot) return;
+
+  if (spotifyToken) {
+    dot.style.background  = 'var(--green)';
+    text.textContent      = 'Spotify connected';
+    sub.textContent       = 'Search any song from the Now Playing tab';
+    btn.textContent       = 'Reconnect';
+    btn.style.background  = 'var(--bg3)';
+    btn.style.color       = 'var(--text2)';
+    if (note) note.style.display = 'block'; // show quota reminder
+  } else {
+    dot.style.background  = 'var(--text3)';
+    text.textContent      = 'Not connected';
+    sub.textContent       = 'Connect Spotify to search any song';
+    btn.textContent       = 'Connect';
+    btn.style.background  = 'var(--blue)';
+    btn.style.color       = 'white';
+    if (note) note.style.display = 'none';
+  }
 }
 
 async function spotifyFetch(endpoint) {
@@ -1959,9 +2026,26 @@ async function spotifyFetch(endpoint) {
     const res = await fetch('https://api.spotify.com/v1' + endpoint, {
       headers: { 'Authorization': 'Bearer ' + spotifyToken }
     });
-    if (res.status === 401) { spotifyToken = null; return null; }
+    if (res.status === 401) {
+      spotifyToken = null;
+      localStorage.removeItem('audra-spotify-token');
+      localStorage.removeItem('audra-spotify-exp');
+      showError('Spotify session expired — reconnect to continue');
+      return null;
+    }
+    if (res.status === 429) {
+      showError('Too many requests — wait a moment and try again');
+      return null;
+    }
+    if (!res.ok) {
+      showError('Spotify error ' + res.status + ' — try again');
+      return null;
+    }
     return await res.json();
-  } catch(e) { return null; }
+  } catch(e) {
+    showError('No internet connection — check your network');
+    return null;
+  }
 }
 
 // Search input handler
@@ -1977,22 +2061,46 @@ function onSearchInput(val) {
   if (!spotifyToken) {
     results.style.display = 'block';
     results.innerHTML = `<div class="no-results">
-      <div style="margin-bottom:8px;">Connect Spotify to search any song</div>
-      <button onclick="loginSpotify()" style="background:var(--green);color:white;border:none;padding:8px 18px;border-radius:20px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;">Connect Spotify</button>
+      <div style="margin-bottom:4px;font-weight:500;color:var(--text);">Connect Spotify to search</div>
+      <div style="margin-bottom:10px;font-size:11px;color:var(--text2);">Free account works — no Premium needed for previews</div>
+      <button onclick="loginSpotify()" style="background:var(--blue);color:white;border:none;padding:8px 20px;border-radius:20px;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;">Connect Spotify →</button>
     </div>`;
     return;
   }
 
   spinner.style.display = 'block';
   searchDebounce = setTimeout(async () => {
-    const data = await spotifyFetch(`/search?q=${encodeURIComponent(val)}&type=track&limit=6`);
-    spinner.style.display = 'none';
-    if (!data || !data.tracks || !data.tracks.items.length) {
+    try {
+      const data = await spotifyFetch(`/search?q=${encodeURIComponent(val)}&type=track&limit=7`);
+      spinner.style.display = 'none';
+      if (!data) {
+        results.style.display = 'block';
+        results.innerHTML = `<div class="no-results error-state">
+          <div class="error-icon">⚠️</div>
+          <div class="error-msg">Couldn't reach Spotify</div>
+          <div class="error-sub">Check your connection or try reconnecting</div>
+          <button onclick="loginSpotify()" class="error-retry-btn">Reconnect Spotify</button>
+        </div>`;
+        return;
+      }
+      if (!data.tracks || !data.tracks.items.length) {
+        results.style.display = 'block';
+        results.innerHTML = `<div class="no-results">
+          <div style="margin-bottom:4px;font-weight:500;color:var(--text);">No songs found for "${val}"</div>
+          <div style="font-size:11px;color:var(--text2);">Try a different spelling or search by artist name</div>
+        </div>`;
+        return;
+      }
+      renderResults(data.tracks.items);
+    } catch(e) {
+      spinner.style.display = 'none';
       results.style.display = 'block';
-      results.innerHTML = '<div class="no-results">No results found</div>';
-      return;
+      results.innerHTML = `<div class="no-results error-state">
+        <div class="error-icon">⚠️</div>
+        <div class="error-msg">Something went wrong</div>
+        <div class="error-sub">Try searching again in a moment</div>
+      </div>`;
     }
-    renderResults(data.tracks.items);
   }, 400);
 }
 
@@ -2066,23 +2174,33 @@ async function loadSpotifyTrack(track) {
     audioEl.crossOrigin = 'anonymous';
     audioEl.src = track.preview_url;
     audioEl.addEventListener('timeupdate', updateProgress);
+    audioEl.addEventListener('error', () => {
+      showError('Preview failed to load — try another song');
+      isPlaying = false; updatePlayBtn();
+      setStatus('Preview failed', 'var(--coral)');
+    });
     audioEl.addEventListener('ended', () => {
       isPlaying = false; updatePlayBtn();
       setStatus('Preview ended', 'var(--text3)');
+      showNotice('30s preview ended — upload the full MP3 to hear more');
     });
     if (source) { try { source.disconnect(); } catch(e){} }
     source = audioCtx.createMediaElementSource(audioEl);
     source.connect(analyser);
-    audioEl.play();
+    audioEl.play().catch(() => {
+      showError('Playback blocked — tap the play button to start');
+      isPlaying = false; updatePlayBtn();
+    });
     isPlaying = true;
     updatePlayBtn();
-    setStatus('Playing preview · 30s', 'var(--green)');
+    setStatus('Playing 30s preview', 'var(--green)');
     startDraw();
     startLyrics();
     showToast('Playing 30s preview ▶');
   } else {
-    showToast('No preview available for this song');
-    setStatus('No preview — try another song', 'var(--amber)');
+    // No preview — still show metadata and load lyrics
+    setStatus('No preview available', 'var(--amber)');
+    showNotice('No audio preview for this song — try uploading the MP3 or search for another version');
   }
 }
 
@@ -2273,53 +2391,81 @@ function parseLRC(lrc) {
 // Fetch synced lyrics from LRCLIB
 async function fetchLRCLIB(trackName, artistName) {
   try {
-    const q = encodeURIComponent(trackName + ' ' + artistName);
-    const res = await fetch(`https://lrclib.net/api/search?q=${q}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data.length) return null;
+    // Try 1: exact title + artist
+    let q = encodeURIComponent(trackName + ' ' + artistName);
+    let res = await fetch(`https://lrclib.net/api/search?q=${q}`);
+    if (res.ok) {
+      let data = await res.json();
+      let match = data.find(r => r.syncedLyrics) || data.find(r => r.plainLyrics);
+      if (match) {
+        const detail = await fetch(`https://lrclib.net/api/get/${match.id}`);
+        if (detail.ok) {
+          const song = await detail.json();
+          if (song.syncedLyrics || song.plainLyrics) return song.syncedLyrics || song.plainLyrics;
+        }
+      }
+    }
 
-    // Find best match with synced lyrics
-    const match = data.find(r => r.syncedLyrics) || data[0];
-    if (!match) return null;
+    // Try 2: title only (no artist) — catches remixes, covers
+    if (artistName) {
+      q = encodeURIComponent(trackName);
+      res = await fetch(`https://lrclib.net/api/search?q=${q}`);
+      if (res.ok) {
+        const data = await res.json();
+        const match = data.find(r => r.syncedLyrics) || data.find(r => r.plainLyrics);
+        if (match) {
+          const detail = await fetch(`https://lrclib.net/api/get/${match.id}`);
+          if (detail.ok) {
+            const song = await detail.json();
+            if (song.syncedLyrics || song.plainLyrics) return song.syncedLyrics || song.plainLyrics;
+          }
+        }
+      }
+    }
 
-    // Fetch full record for synced lyrics
-    const detail = await fetch(`https://lrclib.net/api/get/${match.id}`);
-    if (!detail.ok) return null;
-    const song = await detail.json();
-    return song.syncedLyrics || song.plainLyrics || null;
+    return null;
   } catch(e) { return null; }
 }
 
 // Load lyrics for a track
 async function loadLyrics(trackName, artistName) {
-  // Reset
   syncedLines = [];
   currentLine = -1;
   lyricsMode  = 'placeholder';
   stopLyricSync();
 
   const lyricsLine = document.getElementById('lyricsLine');
-  lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;">Fetching lyrics...</span>';
+  lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;font-style:italic;">Searching for lyrics...</span>';
 
   const result = await fetchLRCLIB(trackName, artistName);
 
   if (!result) {
-    lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;">No lyrics found — playing without sync</span>';
+    lyricsLine.innerHTML = `
+      <div style="text-align:center;padding:4px 0;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">No lyrics found for this song</div>
+        <div style="font-size:11px;color:var(--text3);">Showing visual rhythm instead</div>
+      </div>`;
     startPlaceholderLyrics();
     return;
   }
 
   if (result.includes('[')) {
-    // Synced LRC format
     syncedLines = parseLRC(result);
-    lyricsMode  = 'synced';
+    if (syncedLines.length === 0) {
+      lyricsLine.innerHTML = '<span style="color:var(--text3);font-size:12px;">Lyrics found but couldn\'t sync — try another song</span>';
+      startPlaceholderLyrics();
+      return;
+    }
+    lyricsMode = 'synced';
     showToast('Synced lyrics loaded ✓');
     renderSyncedLine(-1);
     startLyricSync();
   } else {
-    // Plain text — split into lines, show statically
     const lines = result.split('\n').filter(l => l.trim());
+    if (lines.length === 0) {
+      startPlaceholderLyrics();
+      return;
+    }
     syncedLines = lines.map((text, i) => ({ time: i * 4, text }));
     lyricsMode  = 'synced';
     showToast('Lyrics loaded ✓');
@@ -3078,6 +3224,30 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function showError(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '⚠️ ' + msg;
+  t.style.borderColor = 'var(--coral)';
+  t.style.color = 'var(--coral)';
+  t.classList.add('show');
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.style.borderColor = ''; t.style.color = ''; }, 300);
+  }, 3500);
+}
+
+function showNotice(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = 'ℹ️ ' + msg;
+  t.style.borderColor = 'var(--blue)';
+  t.style.color = 'var(--blue)';
+  t.classList.add('show');
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.style.borderColor = ''; t.style.color = ''; }, 300);
+  }, 3000);
 }
 </script>
 </body>
